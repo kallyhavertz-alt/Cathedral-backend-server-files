@@ -31,4 +31,16 @@ public class Event {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "update_type", nullable = false, length = 50)
+    private String updateType = "EVENTS";
+
+    @Column(name = "notification_sent", nullable = false)
+    private boolean notificationSent = false;
+
+    @Column(name = "featured_event_reading", nullable = false)
+    private boolean featuredEventReading = false;
+
+    @Column(name = "event_reading_text", nullable = false)
+    private String eventReadingText = "";
+
 }
