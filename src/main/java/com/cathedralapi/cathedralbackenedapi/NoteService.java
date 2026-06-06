@@ -2,6 +2,7 @@ package com.cathedralapi.cathedralbackenedapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,7 +50,46 @@ public class NoteService {
         }
 
         note.setCreatedAt(LocalDateTime.now()); // Or use your dynamic payload date string
+        System.out.println("🚀 SERVICE LAYER DEBUNKER: Saving note titled '" + note.getTitle() + "' for User ID: " + note.getUser().getId());
 
         return noteRepository.save(note);
+    }
+
+    public void updateFavoriteMetric(Long noteId, boolean updatedStatus) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Target note data element not found."));
+
+        // Flip the boolean switch
+        note.setIsFavorite(updatedStatus);
+
+        // Commit to PostgreSQL
+        noteRepository.save(note);
+        System.out.println("⭐ CLOUD TRACKER: Note ID " + noteId + " favorite status set to: " + updatedStatus);
+
+    }
+
+    @Transactional
+    public Note updateNote(Long noteId, NoteDto dto) {
+        // 1. Fetch the original note row from PostgreSQL by its ID
+        Note existingNote = noteRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Note row not found for ID: " + noteId));
+
+        // 2. Overwrite the original fields with the new text strings coming from Flutter
+        existingNote.setTitle(dto.getTitle());
+        existingNote.setContent(dto.getContent());
+
+        // Optional: If you update timestamps
+        // existingNote.setUpdatedAt(LocalDateTime.now());
+
+        // 3. Save the modified persistent record back to the PostgreSQL table
+        return noteRepository.save(existingNote);
+    }
+    @Transactional
+    public void deleteNoteById(Long noteId) {
+        // Check existence first to avoid silent repository anomalies
+        if (!noteRepository.existsById(noteId)) {
+            throw new RuntimeException("Note isolation error: Target row not found for ID: " + noteId);
+        }
+        noteRepository.deleteById(noteId);
     }
 }

@@ -34,13 +34,42 @@ public class NoteController {
     }
 
     // 📝 3. UPDATE AN EXISTING NOTE
+    // 📝 3. UPDATE AN EXISTING NOTE (CORRECTED & BULLETPROOF)
     @PutMapping("/update/{noteId}")
-    public ResponseEntity<?> updateNote(@PathVariable("noteId") Long noteId, @RequestBody Map<String, String> updates) {
+    public ResponseEntity<?> updateNote(@PathVariable("noteId") Long noteId, @RequestBody NoteDto dto) {
         try {
-            Note updated = noteService.createNote(noteId, (NoteDto) updates);
+            // 🛡️ Pass the target primary key ID and the type-safe DTO payload to a dedicated update handler
+            Note updated = noteService.updateNote(noteId, dto);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            System.err.println("🚨 BACKEND UPDATE FAILURE: " + e.getMessage());
+            return ResponseEntity.status(500).body("Failed to update note: " + e.getMessage());
+        }
+    }
+    @PatchMapping("/{noteId}/favorite")
+    public ResponseEntity<?> toggleNoteFavoriteStatus(
+            @PathVariable Long noteId,
+            @RequestParam("status") boolean currentStatus) {
+        try {
+            // Toggle state inversion logic executed seamlessly
+            boolean updatedStatus = !currentStatus;
+            noteService.updateFavoriteMetric(noteId, updatedStatus);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    // 🗑️ 4. PERMANENTLY DELETE A NOTE
+    @DeleteMapping("/delete/{noteId}")
+    public ResponseEntity<?> deleteNotePermanently(@PathVariable("noteId") Long noteId) {
+        System.out.println("📡 DELETION NETWORK HIT: Request to permanently purge Note ID: " + noteId);
+        try {
+            noteService.deleteNoteById(noteId);
+            System.out.println("✅ BACKEND PURGE SUCCESS: Note ID " + noteId + " removed from PostgreSQL.");
+            return ResponseEntity.ok().body("Note deleted successfully");
+        } catch (RuntimeException e) {
+            System.err.println("🚨 BACKEND DELETION CRASH: Could not drop note row: " + e.getMessage());
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 }

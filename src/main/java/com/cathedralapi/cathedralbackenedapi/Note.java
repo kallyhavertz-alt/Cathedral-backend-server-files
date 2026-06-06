@@ -41,4 +41,7 @@ public class Note {
     @Column(name = "event_title", nullable = false, length = 200)
     private String eventTitle;
 
-}
+    @Column(name = "is_favorite")
+    private Boolean isFavorite = false; // Defaults to false for new notes
+
+     }
