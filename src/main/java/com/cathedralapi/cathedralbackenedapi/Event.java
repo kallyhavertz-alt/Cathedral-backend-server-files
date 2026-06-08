@@ -43,4 +43,7 @@ public class Event {
     @Column(name = "event_reading_text", nullable = false)
     private String eventReadingText = "";
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
 }
