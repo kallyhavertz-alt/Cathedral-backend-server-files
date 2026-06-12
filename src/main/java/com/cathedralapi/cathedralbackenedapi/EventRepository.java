@@ -7,7 +7,7 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
     // Fetches all events sorted by upcoming date sequence
-    List<Event> findAllByOrderByEventDateAsc();
+    List<Event> findAllByOrderByIdDesc();
     List<Event> findByUpdateType(String UpdateType);
 
     List<Event> findByNotificationSentFalse();
