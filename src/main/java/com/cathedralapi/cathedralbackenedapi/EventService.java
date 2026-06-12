@@ -10,16 +10,9 @@ public class EventService {
 
     @Autowired
     private EventRepository eventRepository;
-    // Your existing repository
-
-    // 🎯 The method your controller is looking for to save data
-    // Inside your EventService or EventController where you fetch events
-    List<Event> events = eventRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     public Event saveEvent(Event event) {
         return eventRepository.save(event);
     }
-
-    // Optional: Useful later when Flutter needs to pull the updates
     public List<Event> getAllEvents() {
 
         return eventRepository.findAllByOrderByIdDesc();

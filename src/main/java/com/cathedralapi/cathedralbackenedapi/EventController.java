@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
+@CrossOrigin
 public class EventController {
 
     @Autowired
@@ -19,7 +20,6 @@ public class EventController {
     @Autowired
     private NotificationService notificationService;
 
-    // 🔥 FIXED: Now calling the lowercase instance variable via the Service layer
     @GetMapping("/all")
     public List<Event> getAllEvents() {
         return eventService.getAllEvents();
