@@ -35,13 +35,13 @@ public class Event {
     private String updateType = "EVENTS";
 
     @Column(name = "notification_sent", nullable = false)
-    private boolean notificationSent = false;
+    private String notificationSent =  "";
 
-    @Column(name = "featured_event_reading", nullable = false)
-    private boolean featuredEventReading = false;
+    @Column(name = "featured_event_reading", nullable = false, length = 50)
+    private String featuredEventReading = "";
 
-    @Column(name = "event_reading_text", nullable = false)
-    private String eventReadingText = "";
+    @Column(columnDefinition = "TEXT")
+    private String eventReadingText;
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;
