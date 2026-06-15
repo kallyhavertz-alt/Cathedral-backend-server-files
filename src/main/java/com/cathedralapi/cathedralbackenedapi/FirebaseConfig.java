@@ -17,22 +17,17 @@ public class FirebaseConfig {
     @PostConstruct
     public void initializeFirebase() {
         try {
-            InputStream serviceAccountStream = null;
+            InputStream serviceAccountStream;
 
-            // 🔍 1. Look in Render's standard root mounting directory
-            File renderSecretRoot = new File("/opt/render/project/src/firebase-service-account.json");
-            // 🔍 2. Look in the local execution directory
-            File localSecretRoot = new File("firebase-service-account.json");
+            // 🔍 1. Read the raw text string directly from Environment Variables
+            String rawJsonData = System.getenv("FIREBASE_JSON_DATA");
 
-            if (renderSecretRoot.exists()) {
-                System.out.println("🛡️ SUCCESS: Found Firebase credentials at absolute Render Path!");
-                serviceAccountStream = new FileInputStream(renderSecretRoot);
-            } else if (localSecretRoot.exists()) {
-                System.out.println("🛡️ SUCCESS: Found Firebase credentials at relative Local Path!");
-                serviceAccountStream = new FileInputStream(localSecretRoot);
+            if (rawJsonData != null && !rawJsonData.trim().isEmpty()) {
+                System.out.println("🛡️ SUCCESS: Found Firebase credentials text inside Environment Variables!");
+                serviceAccountStream = new java.io.ByteArrayInputStream(rawJsonData.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             } else {
-                // 🔍 3. Fallback to inside the JAR resources folder (local machine IDE test)
-                System.out.println("🏠 No external file detected. Checking inside src/main/resources folder...");
+                // 🔍 2. Fallback for your local IntelliJ environment
+                System.out.println("🏠 Environment variable empty. Checking local classpath resources (IntelliJ)...");
                 serviceAccountStream = new ClassPathResource("firebase-service-account.json").getInputStream();
             }
 
