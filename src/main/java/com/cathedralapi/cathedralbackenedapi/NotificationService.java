@@ -24,21 +24,26 @@ public class NotificationService {
             // 🎯 1. Customize the notification title banner based on the Update Type
             String alertTitle = "New Cathedral Update";
             if ("BISHOP_SPECIAL".equalsIgnoreCase(event.getUpdateType())) {
-                alertTitle = "🚨 Bishop's Special Schedule Update";
+                alertTitle = "Bishop's Special Schedule Update";
             } else if ("ANNOUNCEMENT".equalsIgnoreCase(event.getUpdateType())) {
                 alertTitle = "📢 New Announcement";
             } else if ("EVENT".equalsIgnoreCase(event.getUpdateType())) {
                 alertTitle = "📅 Upcoming Church Event";
             }
 
+                String alertBody = event.getEventTitle() + ": " + event.getDescription();
+
+
             // 📝 2. Build the visual text payload for the phone shade
             Notification notification = Notification.builder()
                     .setTitle(alertTitle)
-                    .setBody(event.getEventTitle() + ": " + event.getDescription())
+                    .setBody(alertBody)
                     .build();
 
             // 📡 3. Package the message to broadcast to everyone subscribed to "church_updates"
             Message message = Message.builder()
+                    .putData("title", alertTitle)
+                    .putData("body", alertBody)
                     .setTopic("church_updates") // Broadcast channel
                     .setNotification(notification)
                     .putData("click_action", "FLUTTER_NOTIFICATION_CLICK") // Tells Flutter to open the app on click
