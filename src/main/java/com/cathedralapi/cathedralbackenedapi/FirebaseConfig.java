@@ -7,9 +7,9 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class FirebaseConfig {
@@ -17,17 +17,22 @@ public class FirebaseConfig {
     @PostConstruct
     public void initializeFirebase() {
         try {
-            InputStream serviceAccountStream;
+            InputStream serviceAccountStream = null;
 
-            // 1. Try to read the JSON content directly from System Environment Variables (For Render Production)
-            String firebaseConfigEnv = System.getenv("firebase-service-account.json");
+            // 🔍 1. Look in Render's standard root mounting directory
+            File renderSecretRoot = new File("/opt/render/project/src/firebase-service-account.json");
+            // 🔍 2. Look in the local execution directory
+            File localSecretRoot = new File("firebase-service-account.json");
 
-            if (firebaseConfigEnv != null && !firebaseConfigEnv.trim().isEmpty()) {
-                System.out.println(" Found Firebase credentials in Environment Variables. Initializing...");
-                serviceAccountStream = new ByteArrayInputStream(firebaseConfigEnv.getBytes(StandardCharsets.UTF_8));
+            if (renderSecretRoot.exists()) {
+                System.out.println("🛡️ SUCCESS: Found Firebase credentials at absolute Render Path!");
+                serviceAccountStream = new FileInputStream(renderSecretRoot);
+            } else if (localSecretRoot.exists()) {
+                System.out.println("🛡️ SUCCESS: Found Firebase credentials at relative Local Path!");
+                serviceAccountStream = new FileInputStream(localSecretRoot);
             } else {
-                // 2. Fallback: Read from the local resources folder (For local machine development)
-                System.out.println(" Environment variable not found. Falling back to local class path resource file...");
+                // 🔍 3. Fallback to inside the JAR resources folder (local machine IDE test)
+                System.out.println("🏠 No external file detected. Checking inside src/main/resources folder...");
                 serviceAccountStream = new ClassPathResource("firebase-service-account.json").getInputStream();
             }
 
@@ -37,7 +42,7 @@ public class FirebaseConfig {
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
-                System.out.println("Firebase Admin SDK has been successfully initialized!");
+                System.out.println("🚀 Firebase Admin SDK has been successfully initialized!");
             }
         } catch (Exception e) {
             System.err.println("❌ Critical Failure initializing Firebase Admin SDK: " + e.getMessage());
@@ -45,59 +50,3 @@ public class FirebaseConfig {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*package com.cathedralapi.cathedralbackenedapi;
-
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.InputStream;
-
-@Configuration
-public class FirebaseConfig {
-
-    @PostConstruct
-    public void initializeFirebase() {
-        try {
-            // 🎯 Reads your secret credentials file from the src/main/resources folder
-            InputStream serviceAccount = new ClassPathResource("firebase-service-account.json").getInputStream();
-
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-                System.out.println("🚀 Firebase Admin SDK has been successfully initialized!");
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Failed to initialize Firebase Admin SDK: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-}*/
