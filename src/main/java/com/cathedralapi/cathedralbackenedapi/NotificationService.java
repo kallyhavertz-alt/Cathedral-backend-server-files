@@ -27,7 +27,11 @@ public class NotificationService {
             String alertTitle = " 📅 New Cathedral Update";
             if ("BISHOP_SPECIAL".equalsIgnoreCase(event.getUpdateType())) {
                 alertTitle = "Bishop's Special Schedule Update";
-            } else if ("ANNOUNCEMENT".equalsIgnoreCase(event.getUpdateType())) {
+            }
+            else if("EAGLES_LINK".equalsIgnoreCase(event.getUpdateType())) {
+                alertTitle = "Eagles's Link Chapel Update";
+            }
+             else if ("ANNOUNCEMENT".equalsIgnoreCase(event.getUpdateType())) {
                 alertTitle = "📢 New Announcement";
             } else if ("EVENT".equalsIgnoreCase(event.getUpdateType())) {
                 alertTitle = "📅 Upcoming Church Event";
