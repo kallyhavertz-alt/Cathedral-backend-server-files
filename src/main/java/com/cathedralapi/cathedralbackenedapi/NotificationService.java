@@ -21,8 +21,10 @@ public class NotificationService {
         }
 
         try {
+            System.out.println("📬 NotificationService triggered for Event ID: " + event.getId());
+            System.out.println("📬 Raw UpdateType from Database entity: '" + event.getUpdateType() + "'");
             // 🎯 1. Customize the notification title banner based on the Update Type
-            String alertTitle = "New Cathedral Update";
+            String alertTitle = " 📅 New Cathedral Update";
             if ("BISHOP_SPECIAL".equalsIgnoreCase(event.getUpdateType())) {
                 alertTitle = "Bishop's Special Schedule Update";
             } else if ("ANNOUNCEMENT".equalsIgnoreCase(event.getUpdateType())) {
