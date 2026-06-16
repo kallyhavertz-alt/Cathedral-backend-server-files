@@ -22,7 +22,7 @@ public class LiveStreamConfig {
     private String streamUrl;
 
     @Column(name = "is_live")
-    public Boolean isLive;
+    public Boolean isLive = false;
 
     // THE SYSTEM BIT TRACKER: Maps explicitly to PostgreSQL columns
     @Column(name = "notification_sent")
