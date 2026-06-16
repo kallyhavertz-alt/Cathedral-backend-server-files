@@ -46,7 +46,7 @@ public class Event {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
-    public String isNotificationSent() {
+    public boolean isNotificationSent() {
         return notificationSent.equalsIgnoreCase("upcoming");
     }
 
