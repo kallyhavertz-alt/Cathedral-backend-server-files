@@ -22,7 +22,7 @@ public class NotificationService {
      */
     public void sendPushNotification(Event event) {
         // 🛡️ Safety check: If a notification was already sent for this record, stop here to avoid spamming
-        if (Boolean.parseBoolean(event.isNotificationSent())) {
+        if ("true".equalsIgnoreCase(event.getNotificationSent())) {
             return;
         }
 
