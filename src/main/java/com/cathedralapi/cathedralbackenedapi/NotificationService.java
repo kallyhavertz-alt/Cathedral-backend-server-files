@@ -61,7 +61,7 @@ public class NotificationService {
             System.out.println("Successfully sent push notification payload: " + response);
 
             // 💾 5. Flip the flag to TRUE in PostgreSQL so this alert never triggers again
-            event.setNotificationSent(true);
+            event.setNotificationSent(String.valueOf(true));
             eventRepository.save(event);
 
         } catch (Exception e) {
