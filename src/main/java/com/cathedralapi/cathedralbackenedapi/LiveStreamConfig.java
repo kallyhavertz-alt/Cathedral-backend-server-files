@@ -1,5 +1,6 @@
 package com.cathedralapi.cathedralbackenedapi;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class LiveStreamConfig {
     private String streamUrl;
 
     @Column(name = "is_live")
+    @JsonProperty("isLive")
     public Boolean isLive = false;
 
     // THE SYSTEM BIT TRACKER: Maps explicitly to PostgreSQL columns
