@@ -26,7 +26,7 @@ public class Event {
     private String venue;
 
     @Column(nullable = false, length = 50)
-    private String status = "upcoming"; // Default value matching your sketch logic
+    private String status = "";
 
     @Column(columnDefinition = "TEXT")
     private String description;

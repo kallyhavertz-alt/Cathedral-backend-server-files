@@ -15,7 +15,7 @@ public class NoteController {
     @Autowired
     private NoteService noteService; // 🛡️ Service layer injected, replacing raw repositories
 
-    // 🔍 1. FETCH ALL NOTES FOR A SPECIFIC USER
+    //  FETCH ALL NOTES FOR A SPECIFIC USER
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Note>> getAllNotes(@PathVariable("userId") Long userId) {
         List<Note> notes = noteService.getNotesByUserId(userId);
@@ -33,12 +33,11 @@ public class NoteController {
         }
     }
 
-    // 📝 3. UPDATE AN EXISTING NOTE
-    // 📝 3. UPDATE AN EXISTING NOTE (CORRECTED & BULLETPROOF)
+    //  UPDATE AN EXISTING NOTE
     @PutMapping("/update/{noteId}")
     public ResponseEntity<?> updateNote(@PathVariable("noteId") Long noteId, @RequestBody NoteDto dto) {
         try {
-            // 🛡️ Pass the target primary key ID and the type-safe DTO payload to a dedicated update handler
+            // Pass the target primary key ID and the type-safe DTO payload to a dedicated update handler
             Note updated = noteService.updateNote(noteId, dto);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
@@ -49,17 +48,16 @@ public class NoteController {
     @PatchMapping("/{noteId}/favorite")
     public ResponseEntity<?> toggleNoteFavoriteStatus(
             @PathVariable Long noteId,
-            @RequestParam("status") boolean currentStatus) {
+            @RequestParam("status") boolean targetStatus) {
         try {
-            // Toggle state inversion logic executed seamlessly
-            boolean updatedStatus = !currentStatus;
-            noteService.updateFavoriteMetric(noteId, updatedStatus);
+            // Pass the incoming value directly! No inversion needed.
+            noteService.updateFavoriteMetric(noteId, targetStatus);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    // 🗑️ 4. PERMANENTLY DELETE A NOTE
+    //  PERMANENTLY DELETE A NOTE
     @DeleteMapping("/delete/{noteId}")
     public ResponseEntity<?> deleteNotePermanently(@PathVariable("noteId") Long noteId) {
         System.out.println("📡 DELETION NETWORK HIT: Request to permanently purge Note ID: " + noteId);
