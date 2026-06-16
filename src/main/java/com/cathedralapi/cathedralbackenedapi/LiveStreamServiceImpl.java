@@ -7,6 +7,7 @@ import com.cathedralapi.cathedralbackenedapi.NotificationService;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LiveStreamServiceImpl implements LiveStreamService {
@@ -23,19 +24,20 @@ public class LiveStreamServiceImpl implements LiveStreamService {
         return repository.findAllByOrderByUpdatedAtDesc();
     }
     @Override
-    @Transactional // Good practice to ensure database updates and deletes wrap safely in a single transaction
+    @Transactional
     public LiveStreamConfig saveNewStream(LiveStreamConfig incomingConfig) {
         LiveStreamConfig configToSave;
 
-        // 1. If it's an update, check the existing record state to see if a notification was already sent
+        // 1. Check for existing update records
         if (incomingConfig.getId() != null) {
-            java.util.Optional<LiveStreamConfig> existing = repository.findById(incomingConfig.getId());
+            Optional<LiveStreamConfig> existing = repository.findById(incomingConfig.getId());
             if (existing.isPresent()) {
                 configToSave = existing.get();
                 configToSave.setTitle(incomingConfig.getTitle());
                 configToSave.setStreamUrl(incomingConfig.getStreamUrl());
-                configToSave.setLive(incomingConfig.isLive());
-                // Keep the old notification state for evaluation unless the live toggle changed
+
+                // 🚀 FIX 1: Changed incomingConfig.isLive() -> incomingConfig.getIsLive()
+                configToSave.setIsLive(incomingConfig.getIsLive());
             } else {
                 configToSave = incomingConfig;
             }
@@ -43,36 +45,36 @@ public class LiveStreamServiceImpl implements LiveStreamService {
             configToSave = incomingConfig;
         }
 
-        // 2. Update timestamp stamp
         configToSave.setUpdatedAt(LocalDateTime.now());
 
-        // 3. 🚀 CRITICAL NOTIFICATION TRIGGER LOGIC (Clean as we did for events)
-        if (configToSave.isLive() && !configToSave.isNotificationSent()) {
+        // 🚀 THE OBJECT WRAPPER SAFETY PARSER ENGINE
+        // We safely treat null values from legacy database columns as false
+        boolean liveStatus = configToSave.getIsLive() != null && configToSave.getIsLive(); // 🚀 FIX 2: Changed .isLive() -> .getIsLive()
+        boolean alertAlreadySent = configToSave.getNotificationSent() != null && configToSave.getNotificationSent(); // 🚀 FIX 3: Changed .isNotificationSent() -> .getNotificationSent()
 
+        // 2. Evaluate condition to trigger notification broadcast
+        if (liveStatus && !alertAlreadySent) {
             try {
-                // Blast FCM push payload out to the congregation
                 notificationService.sendBroadcastNotification(
-                        configToSave.getId() != null ? configToSave.getId() : 0L, // Handle temp id safety
-                        "🔴 CATHEDRAL: LIVE NOW",
+                        configToSave.getId() != null ? configToSave.getId() : 0L,
+                        "🔴 EAGLES LINK: LIVE NOW",
                         "We are live for: " + configToSave.getTitle(),
-                        ""
+                        "EAGLES_LINK"
                 );
 
-                // Flip the tracking permanently so updates don't spam Postman
                 configToSave.setNotificationSent(true);
                 System.out.println("📬 Live Link FCM broadcast successfully transmitted.");
             } catch (Exception e) {
                 System.err.println("🚨 Notification pipeline dropped payload transmission: " + e.getMessage());
             }
-        } else if (!configToSave.isLive()) {
-            // 🔄 If an admin sets it to offline, reset the flag so it can fire fresh on the next stream service launch
+        } else if (!liveStatus) { // 🚀 FIX 4: Evaluates using our clean primitive boolean variable
             configToSave.setNotificationSent(false);
         }
 
-        // 4. Commit to PostgreSQL
+        // 3. Commit to PostgreSQL securely
         LiveStreamConfig saved = repository.save(configToSave);
 
-        // 🚨 Capping Guardrail: If we have more than 4 items, delete the oldest
+        // Capping Guardrail (Keeps table size minimal)
         List<LiveStreamConfig> allStreams = repository.findAllByOrderByUpdatedAtDesc();
         if (allStreams.size() > 4) {
             for (int i = 4; i < allStreams.size(); i++) {

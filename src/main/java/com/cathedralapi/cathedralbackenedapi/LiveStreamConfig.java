@@ -22,7 +22,7 @@ public class LiveStreamConfig {
     private String streamUrl;
 
     @Column(name = "is_live")
-    private Boolean isLive;
+    public Boolean isLive;
 
     // THE SYSTEM BIT TRACKER: Maps explicitly to PostgreSQL columns
     @Column(name = "notification_sent")
@@ -30,4 +30,6 @@ public class LiveStreamConfig {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+
 }
