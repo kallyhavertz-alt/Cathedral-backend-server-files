@@ -11,7 +11,7 @@ import java.util.List;
 public class LiveStreamController {
 
     @Autowired
-    private LiveStreamService liveStreamService; // 🎯 Injecting our updated interface
+    private LiveStreamService liveStreamService;
 
     // 🎯 Changed from a single object to a List of all active 3-4 videos
     @GetMapping("/current")
