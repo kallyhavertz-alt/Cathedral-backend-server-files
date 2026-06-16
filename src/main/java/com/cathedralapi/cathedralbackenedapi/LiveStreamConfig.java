@@ -22,11 +22,11 @@ public class LiveStreamConfig {
     private String streamUrl;
 
     @Column(name = "is_live")
-    private boolean isLive;
+    private Boolean isLive;
 
     // THE SYSTEM BIT TRACKER: Maps explicitly to PostgreSQL columns
     @Column(name = "notification_sent")
-    private boolean notificationSent = false;
+    private Boolean notificationSent = false;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
