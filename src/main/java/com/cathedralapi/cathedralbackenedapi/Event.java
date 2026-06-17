@@ -40,7 +40,7 @@ public class Event {
     @Column(name = "featured_event_reading", nullable = false, length = 50)
     private String featuredEventReading = "";
 
-    @Column(columnDefinition = "TEXT", length = 10000000)
+    @Column(name = "event_reading_text", columnDefinition = "TEXT")
     private String eventReadingText;
 
     @Column(name = "image_url", length = 500)
