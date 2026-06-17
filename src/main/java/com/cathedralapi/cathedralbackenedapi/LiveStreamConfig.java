@@ -28,6 +28,7 @@ public class LiveStreamConfig {
 
     // THE SYSTEM BIT TRACKER: Maps explicitly to PostgreSQL columns
     @Column(name = "notification_sent")
+    @JsonProperty("notificationSent")
     private Boolean notificationSent = false;
 
     @Column(name = "updated_at")
