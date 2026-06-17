@@ -57,9 +57,9 @@ public class LiveStreamServiceImpl implements LiveStreamService {
             try {
                 notificationService.sendBroadcastNotification(
                         configToSave.getId() != null ? configToSave.getId() : 0L,
-                        "🔴 EAGLES LINK: LIVE NOW",
+                        "🔴 CATHEDRAL SERVICE: LIVE NOW",
                         "We are live for: " + configToSave.getTitle(),
-                        "EAGLES_LINK"
+                        "GENERALEVENT"
                 );
 
                 configToSave.setNotificationSent(true);
