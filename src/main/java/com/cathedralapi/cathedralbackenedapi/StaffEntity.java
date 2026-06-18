@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "cathedral_staff") // Maps to your active PostgreSQL table
+@Table(name = "cathedral_staff")
 public class StaffEntity {
 
-    // Getters and Setters
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +43,6 @@ public class StaffEntity {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Default constructor required by JPA
     public StaffEntity() {}
 
 }

@@ -17,9 +17,7 @@ public class NotificationService {
     @Autowired
     private EventRepository eventRepository;
 
-    /**
-     * 📅 1. Pipeline for structural Event entities (Kept exactly as you designed)
-     */
+
     public void sendPushNotification(Event event) {
         // 🛡️ Safety check: If a notification was already sent for this record, stop here to avoid spamming
         if ("true".equalsIgnoreCase(event.getNotificationSent())) {
@@ -74,9 +72,7 @@ public class NotificationService {
         }
     }
 
-    /**
-     * 📡 3. Private Helper: Code reuse to cleanly handle the heavy lifting for Firebase
-     */
+
     private void executeFcmTransmission(String title, String body, String updateType) throws Exception {
         // Build the visible shade banner notification container
         Notification notification = Notification.builder()
