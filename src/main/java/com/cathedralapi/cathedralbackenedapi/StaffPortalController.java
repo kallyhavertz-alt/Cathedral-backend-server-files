@@ -5,6 +5,7 @@ import com.cathedralapi.cathedralbackenedapi.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
@@ -17,6 +18,9 @@ public class StaffPortalController {
 
     @Autowired
     private StaffService staffService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<?> processStaffRegistration(@RequestBody StaffRegistrationDTO registrationDTO) {
@@ -33,6 +37,7 @@ public class StaffPortalController {
             ));
         }
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginStaffMember(@RequestBody StaffLoginRequest loginRequest) {
         // 1. Hard UI Gate: Reject null parsing payloads immediately
