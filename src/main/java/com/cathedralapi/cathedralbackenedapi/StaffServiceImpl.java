@@ -5,7 +5,7 @@ import com.cathedralapi.cathedralbackenedapi.StaffEntity;
 import com.cathedralapi.cathedralbackenedapi.StaffRepository;
 import com.cathedralapi.cathedralbackenedapi.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // Or your alternative hashing provider
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service

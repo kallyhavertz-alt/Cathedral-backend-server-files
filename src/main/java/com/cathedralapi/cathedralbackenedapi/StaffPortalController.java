@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 @RestController
@@ -29,6 +30,26 @@ public class StaffPortalController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                     "status", "error",
                     "message", e.getMessage()
+            ));
+        }
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginStaffMember(@RequestBody StaffLoginRequest loginRequest) {
+        System.out.println(MessageFormat.format("\uD83D\uDCE1 Processing login attempt for identifier: {0}", loginRequest.getIdentity));
+
+        // TODO: Wire up your authentication logic here via your StaffService layer
+        // Example: Verification of user identity against database rows and password match check
+        boolean isAuthenticated = true; // Placeholder for your DB service authentication step
+
+        if (isAuthenticated) {
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Login verified successfully!"
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "status", "error",
+                    "message", "Invalid credentials supplied."
             ));
         }
     }
