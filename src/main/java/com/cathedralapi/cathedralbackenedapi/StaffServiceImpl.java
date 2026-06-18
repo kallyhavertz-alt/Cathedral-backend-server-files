@@ -36,4 +36,9 @@ public class StaffServiceImpl implements StaffService {
 
         staffRepository.save(staff);
     }
+
+    @Override
+    public boolean verifyStaffCredentials(String trim, String password) {
+        return false;
+    }
 }

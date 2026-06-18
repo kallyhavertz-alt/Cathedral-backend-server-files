@@ -35,11 +35,23 @@ public class StaffPortalController {
     }
     @PostMapping("/login")
     public ResponseEntity<?> loginStaffMember(@RequestBody StaffLoginRequest loginRequest) {
-        System.out.println(MessageFormat.format("\uD83D\uDCE1 Processing login attempt for identifier: {0}", loginRequest.getIdentity));
+        // 1. Hard UI Gate: Reject null parsing payloads immediately
+        if (loginRequest.getIdentity() == null || loginRequest.getPassword() == null) {
+            System.out.println("🚨 Rejected malformed blank JSON payload intercept.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "status", "error",
+                    "message", "Malformed payload: Identification parameters cannot be blank."
+            ));
+        }
 
-        // TODO: Wire up your authentication logic here via your StaffService layer
-        // Example: Verification of user identity against database rows and password match check
-        boolean isAuthenticated = true; // Placeholder for your DB service authentication step
+        System.out.println("📡 Processing login attempt for identifier: " + loginRequest.getIdentity());
+
+        // 2. Strict Authentication Chain Check against your PostgreSQL entity columns
+        // Replace this with your actual database lookup (e.g., staffRepository.findByEmailOrPhoneNumber)
+        boolean isAuthenticated = staffService.verifyStaffCredentials(
+                loginRequest.getIdentity().trim(),
+                loginRequest.getPassword()
+        );
 
         if (isAuthenticated) {
             return ResponseEntity.ok(Map.of(
@@ -47,9 +59,10 @@ public class StaffPortalController {
                     "message", "Login verified successfully!"
             ));
         } else {
+            // 🔒 Explicitly fail with an HTTP 401 Unauthorized block status code
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                     "status", "error",
-                    "message", "Invalid credentials supplied."
+                    "message", "Invalid email/phone number or password."
             ));
         }
     }
