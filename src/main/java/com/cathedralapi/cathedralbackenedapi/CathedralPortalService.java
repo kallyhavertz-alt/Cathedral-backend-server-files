@@ -3,7 +3,7 @@ package com.cathedralapi.cathedralbackenedapi;
 import com.cathedralapi.cathedralbackenedapi.NoticeDTO;
 import com.cathedralapi.cathedralbackenedapi.PostDTO;
 import java.util.List;
-
+//this was commited
 public interface CathedralPortalService {
     PostDTO createPost(PostDTO postDTO);
     NoticeDTO createNotice(NoticeDTO noticeDTO);
