@@ -1,6 +1,8 @@
 package com.cathedralapi.cathedralbackenedapi;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.AndroidConfig;
+import com.google.firebase.messaging.AndroidNotification;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,13 @@ public class NotificationDispatchService {
             // This ensures if the phone drops the visual block, the data mapping saves it!
             data.put(KEY_TITLE, title);
             data.put(KEY_BODY, displayBody);
+            AndroidConfig androidConfig = AndroidConfig.builder()
+                    .setPriority(AndroidConfig.Priority.HIGH) // 🚀 Wakes up aggressive battery savers
+                    .setNotification(AndroidNotification.builder()
+                            .setSound("default")
+                            .setChannelId("high_importance_channel") // Matches default Flutter channels
+                            .build())
+                    .build();
 
             Notification notification = Notification.builder()
                     .setTitle(title)
@@ -69,6 +78,14 @@ public class NotificationDispatchService {
             Message message = Message.builder()
                     .setTopic(topic)
                     .setNotification(notification)
+                    .putAllData(data)
+                    .build();
+           String canonicalTopic = topic.startsWith("/topics/") ? topic : "/topics/" + topic;
+
+            message = Message.builder()
+                    .setTopic(canonicalTopic)
+                    .setNotification(notification)
+                    .setAndroidConfig(androidConfig)
                     .putAllData(data)
                     .build();
 
