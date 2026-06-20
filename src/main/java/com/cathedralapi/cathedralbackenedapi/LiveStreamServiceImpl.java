@@ -3,7 +3,7 @@ package com.cathedralapi.cathedralbackenedapi;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import com.cathedralapi.cathedralbackenedapi.NotificationService;
+import com.cathedralapi.cathedralbackenedapi.NotificationDispatchService;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +16,7 @@ public class LiveStreamServiceImpl implements LiveStreamService {
     private LiveStreamRepository repository;
 
     @Autowired
-    private NotificationService notificationService;
+    private NotificationDispatchService notificationService;
 
     @Override
     public List<LiveStreamConfig> getAllActiveStreams() {
@@ -55,12 +55,7 @@ public class LiveStreamServiceImpl implements LiveStreamService {
         // 2. Evaluate condition to trigger notification broadcast
         if (liveStatus && !alertAlreadySent) {
             try {
-                notificationService.sendBroadcastNotification(
-                        configToSave.getId() != null ? configToSave.getId() : 0L,
-                        "🔴 CATHEDRAL SERVICE: LIVE NOW",
-                        "We are live for: " + configToSave.getTitle(),
-                        "GENERALEVENT"
-                );
+
 
                 configToSave.setNotificationSent(true);
                 System.out.println("📬 Live Link FCM broadcast successfully transmitted.");
