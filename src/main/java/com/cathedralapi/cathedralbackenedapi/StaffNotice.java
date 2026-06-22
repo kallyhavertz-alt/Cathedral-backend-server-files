@@ -22,4 +22,7 @@ public class StaffNotice {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "sender_id")
+    private String senderId;
+
 }

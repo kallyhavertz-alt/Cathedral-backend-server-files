@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface StaffNoticeRepository extends JpaRepository<StaffNotice, Long> {
     List<StaffNotice> findAllByOrderByCreatedAtDesc();
+
+    List<StaffNotice> findAllBySenderIdOrderByCreatedAtDesc(String senderId);
 }

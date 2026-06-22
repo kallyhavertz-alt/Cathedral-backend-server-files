@@ -32,4 +32,7 @@ public class CathedralPost {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "sender_id")
+    private String senderId;
+
 }

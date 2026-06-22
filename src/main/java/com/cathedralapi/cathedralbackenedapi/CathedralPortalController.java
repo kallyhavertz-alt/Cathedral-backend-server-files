@@ -30,21 +30,27 @@ public class CathedralPortalController {
         return ResponseEntity.ok(portalService.createNotice(noticeDTO));
     }
 
-    // 📥 FETCH FEED CONTENT (For General App Tabs)
+    // 📥 FETCH FEED CONTENT (For General App Tabs - public view stays open)
     @GetMapping("/posts")
     public ResponseEntity<List<PostDTO>> getPostsByCategory(@RequestParam String type) {
         return ResponseEntity.ok(portalService.getPostsByCategory(type));
     }
 
-    // 📥 FETCH ALL SENT POSTS HISTORY (For Workspace History Feed)
+    // 📥 FETCH ISOLATED SENT POSTS HISTORY (Filtered by active staff identity)
     @GetMapping("/staff/history/posts")
-    public ResponseEntity<List<PostDTO>> getAllPostsHistory() {
+    public ResponseEntity<List<PostDTO>> getAllPostsHistory(@RequestParam(required = false) String senderId) {
+        if (senderId != null && !senderId.trim().isEmpty()) {
+            return ResponseEntity.ok(portalService.getPostsBySender(senderId));
+        }
         return ResponseEntity.ok(portalService.getAllPostsHistory());
     }
 
-    // 📥 FETCH ALL SENT NOTICES HISTORY (For Workspace History Feed)
+    // 📥 FETCH ISOLATED SENT NOTICES HISTORY (Filtered by active staff identity)
     @GetMapping("/staff/history/notices")
-    public ResponseEntity<List<NoticeDTO>> getAllNoticesHistory() {
+    public ResponseEntity<List<NoticeDTO>> getAllNoticesHistory(@RequestParam(required = false) String senderId) {
+        if (senderId != null && !senderId.trim().isEmpty()) {
+            return ResponseEntity.ok(portalService.getNoticesBySender(senderId));
+        }
         return ResponseEntity.ok(portalService.getAllNoticesHistory());
     }
 }

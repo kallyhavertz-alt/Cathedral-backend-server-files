@@ -10,4 +10,6 @@ public interface CathedralPortalService {
     List<PostDTO> getPostsByCategory(String category);
     List<PostDTO> getAllPostsHistory();
     List<NoticeDTO> getAllNoticesHistory();
+    List<PostDTO> getPostsBySender(String senderId);
+    List<NoticeDTO> getNoticesBySender(String senderId);
 }

@@ -38,6 +38,7 @@ public class CathedralPortalServiceImpl implements CathedralPortalService {
         post.setSubService(dto.getSubService() != null ? dto.getSubService() : "NONE");
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
+        post.setSenderId(dto.getSenderId()); // 🚀 NEW: Capture sender identifier on storage
 
         CathedralPost saved = postRepository.save(post);
 
@@ -51,6 +52,7 @@ public class CathedralPortalServiceImpl implements CathedralPortalService {
     public NoticeDTO createNotice(NoticeDTO dto) {
         StaffNotice notice = new StaffNotice();
         notice.setContent(dto.getContent());
+        notice.setSenderId(dto.getSenderId()); // 🚀 NEW: Capture sender identifier on storage
 
         StaffNotice saved = noticeRepository.save(notice);
 
@@ -78,6 +80,19 @@ public class CathedralPortalServiceImpl implements CathedralPortalService {
                 .stream().map(this::mapToNoticeDTO).collect(Collectors.toList());
     }
 
+    // 🚀 NEW: Isolated retrieval methods tracking sender identity
+    @Override
+    public List<PostDTO> getPostsBySender(String senderId) {
+        return postRepository.findAllBySenderIdOrderByCreatedAtDesc(senderId)
+                .stream().map(this::mapToPostDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NoticeDTO> getNoticesBySender(String senderId) {
+        return noticeRepository.findAllBySenderIdOrderByCreatedAtDesc(senderId)
+                .stream().map(this::mapToNoticeDTO).collect(Collectors.toList());
+    }
+
     private PostDTO mapToPostDTO(CathedralPost post) {
         PostDTO dto = new PostDTO();
         dto.setId(post.getId());
@@ -85,6 +100,7 @@ public class CathedralPortalServiceImpl implements CathedralPortalService {
         dto.setSubService(post.getSubService());
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
+        dto.setSenderId(post.getSenderId()); // Map sender data downstream
         // 🧠 Split the native timestamp cleanly on the backend before sending to Flutter
         dto.setFormattedDate(post.getCreatedAt().format(dateFormatter));
         dto.setFormattedTime(post.getCreatedAt().format(timeFormatter));
@@ -95,6 +111,7 @@ public class CathedralPortalServiceImpl implements CathedralPortalService {
         NoticeDTO dto = new NoticeDTO();
         dto.setId(notice.getId());
         dto.setContent(notice.getContent());
+        dto.setSenderId(notice.getSenderId()); // Map sender data downstream
         dto.setFormattedDate(notice.getCreatedAt().format(dateFormatter));
         dto.setFormattedTime(notice.getCreatedAt().format(timeFormatter));
         return dto;

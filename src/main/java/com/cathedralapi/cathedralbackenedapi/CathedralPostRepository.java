@@ -8,4 +8,6 @@ public interface CathedralPostRepository extends JpaRepository<CathedralPost, Lo
     // 🔍 Dynamic chronological search query fetching items newest first
     List<CathedralPost> findByPostTypeOrderByCreatedAtDesc(String postType);
     List<CathedralPost> findAllByOrderByCreatedAtDesc();
+
+    List<CathedralPost> findAllBySenderIdOrderByCreatedAtDesc(String senderId);
 }
