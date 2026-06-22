@@ -9,7 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
 public class FirebaseConfig {
@@ -20,16 +20,16 @@ public class FirebaseConfig {
             if (FirebaseApp.getApps().isEmpty()) {
                 InputStream serviceAccountStream;
 
-                // 🛰️ 1. Look for the custom raw content environment variable (Railway)
-                String rawJsonData = System.getenv("FIREBASE_AUTH_STRING");
+                // 🛰️ 1. Look for the safe, continuous Base64 text string from Railway
+                String base64Data = System.getenv("FIREBASE_KEY_BASE64");
 
-                if (rawJsonData != null && !rawJsonData.trim().isEmpty()) {
-                    System.out.println("🛡️ SUCCESS: Found raw Firebase JSON text data inside Environment Variables!");
-                    // Convert raw text strings straight into memory byte arrays safely
-                    serviceAccountStream = new ByteArrayInputStream(rawJsonData.getBytes(StandardCharsets.UTF_8));
+                if (base64Data != null && !base64Data.trim().isEmpty()) {
+                    System.out.println("🛡️ PRODUCTION: Found Base64 text string. Decoding binary signature...");
+                    byte[] pristineBytes = Base64.getDecoder().decode(base64Data.trim());
+                    serviceAccountStream = new ByteArrayInputStream(pristineBytes);
                 } else {
-                    // 🏠 2. Local Fallback Configuration (IntelliJ local execution runner)
-                    System.out.println("🏠 Environment variable empty. Checking local classpath resources (IntelliJ)...");
+                    // 🏠 2. Local IntelliJ fallback
+                    System.out.println("🏠 LOCAL: Loading local classpath resource file...");
                     serviceAccountStream = new ClassPathResource("firebase-service-account.json").getInputStream();
                 }
 
@@ -38,9 +38,7 @@ public class FirebaseConfig {
                         .build();
 
                 FirebaseApp.initializeApp(options);
-                System.out.println("🚀 Firebase Admin SDK has been successfully initialized via safe text stream!");
-            } else {
-                System.out.println("ℹ️ Firebase App already initialized. Skipping initialization phase.");
+                System.out.println("🚀 SUCCESS: Firebase Admin SDK initialized successfully!");
             }
         } catch (Exception e) {
             System.err.println("❌ Critical Failure initializing Firebase Admin SDK: " + e.getMessage());
