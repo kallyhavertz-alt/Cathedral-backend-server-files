@@ -78,16 +78,10 @@ public class NotificationDispatchService {
             Message message = Message.builder()
                     .setTopic(topic)
                     .setNotification(notification)
-                    .putAllData(data)
-                    .build();
-           String canonicalTopic = topic.startsWith("/topics/") ? topic : "/topics/" + topic;
-
-            message = Message.builder()
-                    .setTopic(canonicalTopic)
-                    .setNotification(notification)
                     .setAndroidConfig(androidConfig)
                     .putAllData(data)
                     .build();
+
 
             FirebaseMessaging.getInstance().sendAsync(message);
             System.out.println("📡 DISPATCH ENGINE -> Outbound packet successfully handed to Google FCM for topic [" + topic + "]");
