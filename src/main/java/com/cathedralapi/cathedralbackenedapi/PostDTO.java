@@ -15,5 +15,6 @@ public class PostDTO {
     private String formattedDate;
     private String formattedTime;
     private String senderId;
+    private String senderName;
 
 }

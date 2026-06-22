@@ -6,11 +6,11 @@ import lombok.Setter;
 @Setter
 @Getter
 public class NoticeDTO {
-    // Getters and Setters
     private Long id;
     private String content;
     private String formattedDate;
     private String formattedTime;
     private String senderId;
+    private String senderName;
 
 }
