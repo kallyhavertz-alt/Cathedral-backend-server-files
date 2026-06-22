@@ -6,7 +6,10 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class FirebaseConfig {
@@ -15,25 +18,29 @@ public class FirebaseConfig {
     public void initializeFirebase() {
         try {
             if (FirebaseApp.getApps().isEmpty()) {
-                GoogleCredentials credentials;
+                InputStream serviceAccountStream;
 
-                // 🛰️ 1. Check if Google's native environment variable is present (Railway)
-                if (System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null) {
-                    System.out.println("🛡️ SUCCESS: GOOGLE_APPLICATION_CREDENTIALS detected. Using native IAM injection layer...");
-                    credentials = GoogleCredentials.getApplicationDefault();
+                // 🛰️ 1. Look for the custom raw content environment variable (Railway)
+                String rawJsonData = System.getenv("FIREBASE_AUTH_STRING");
+
+                if (rawJsonData != null && !rawJsonData.trim().isEmpty()) {
+                    System.out.println("🛡️ SUCCESS: Found raw Firebase JSON text data inside Environment Variables!");
+                    // Convert raw text strings straight into memory byte arrays safely
+                    serviceAccountStream = new ByteArrayInputStream(rawJsonData.getBytes(StandardCharsets.UTF_8));
                 } else {
-                    // 🏠 2. Local Fallback (IntelliJ Execution Runner)
-                    System.out.println("静态 Context: Environment variable absent. Loading local classpath resource file...");
-                    InputStream localStream = new ClassPathResource("firebase-service-account.json").getInputStream();
-                    credentials = GoogleCredentials.fromStream(localStream);
+                    // 🏠 2. Local Fallback Configuration (IntelliJ local execution runner)
+                    System.out.println("🏠 Environment variable empty. Checking local classpath resources (IntelliJ)...");
+                    serviceAccountStream = new ClassPathResource("firebase-service-account.json").getInputStream();
                 }
 
                 FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(credentials)
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccountStream))
                         .build();
 
                 FirebaseApp.initializeApp(options);
-                System.out.println("🚀 Firebase Admin SDK has been successfully initialized natively!");
+                System.out.println("🚀 Firebase Admin SDK has been successfully initialized via safe text stream!");
+            } else {
+                System.out.println("ℹ️ Firebase App already initialized. Skipping initialization phase.");
             }
         } catch (Exception e) {
             System.err.println("❌ Critical Failure initializing Firebase Admin SDK: " + e.getMessage());
