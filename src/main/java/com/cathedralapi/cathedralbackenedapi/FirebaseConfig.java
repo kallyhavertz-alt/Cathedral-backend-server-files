@@ -7,9 +7,10 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
 public class FirebaseConfig {
@@ -19,26 +20,42 @@ public class FirebaseConfig {
         try {
             InputStream serviceAccountStream;
 
-            // 🔍 1. Read the raw text string directly from Environment Variables
-            String rawJsonData = System.getenv("FIREBASE_JSON_DATA");
+            // 🔍 1. First, check for the robust Base64 environment variable (Railway Production)
+            String base64JsonData = System.getenv("FIREBASE_CONFIG_BASE64");
 
-            if (rawJsonData != null && !rawJsonData.trim().isEmpty()) {
-                System.out.println("🛡️ SUCCESS: Found Firebase credentials text inside Environment Variables!");
-                serviceAccountStream = new java.io.ByteArrayInputStream(rawJsonData.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            if (base64JsonData != null && !base64JsonData.trim().isEmpty()) {
+                System.out.println("🛡️ SUCCESS: Found Base64 Firebase credentials inside Environment Variables!");
+
+                // 🔓 Cleanly decode the indestructible string into normal JSON bytes
+                byte[] decodedBytes = Base64.getDecoder().decode(base64JsonData.trim());
+                serviceAccountStream = new ByteArrayInputStream(decodedBytes);
+
             } else {
-                // 🔍 2. Fallback for your local IntelliJ environment
-                System.out.println("🏠 Environment variable empty. Checking local classpath resources (IntelliJ)...");
-                serviceAccountStream = new ClassPathResource("firebase-service-account.json").getInputStream();
+                // 🔍 2. Fallback check for the old text key just in case
+                String rawJsonData = System.getenv("FIREBASE_JSON_DATA");
+
+                if (rawJsonData != null && !rawJsonData.trim().isEmpty()) {
+                    System.out.println("⚠️ WARNING: Falling back to raw text variable string...");
+                    serviceAccountStream = new ByteArrayInputStream(rawJsonData.getBytes(StandardCharsets.UTF_8));
+                } else {
+                    // 🏠 3. Local Development Fallback (IntelliJ local execution runner)
+                    System.out.println("🏠 Environment variables empty. Checking local classpath resources (IntelliJ)...");
+                    serviceAccountStream = new ClassPathResource("firebase-service-account.json").getInputStream();
+                }
             }
 
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccountStream))
-                    .build();
-
+            // Build options and register application instance safely
             if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccountStream))
+                        .build();
+
                 FirebaseApp.initializeApp(options);
                 System.out.println("🚀 Firebase Admin SDK has been successfully initialized!");
+            } else {
+                System.out.println("ℹ️ Firebase App instance already initialized. Skipping configuration phase.");
             }
+
         } catch (Exception e) {
             System.err.println("❌ Critical Failure initializing Firebase Admin SDK: " + e.getMessage());
             e.printStackTrace();
