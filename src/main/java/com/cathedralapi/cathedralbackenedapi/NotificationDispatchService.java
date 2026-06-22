@@ -83,8 +83,11 @@ public class NotificationDispatchService {
                     .build();
 
 
-            FirebaseMessaging.getInstance().sendAsync(message);
-            System.out.println("📡 DISPATCH ENGINE -> Outbound packet successfully handed to Google FCM for topic [" + topic + "]");
+           // FirebaseMessaging.getInstance().sendAsync(message);
+          //  System.out.println("📡 DISPATCH ENGINE -> Outbound packet successfully handed to Google FCM for topic [" + topic + "]");
+            String response = FirebaseMessaging.getInstance().send(message);
+
+            System.out.println("FCM MESSAGE ID: " + response);
 
         } catch (Exception e) {
             System.err.println("❌ FCM Delivery Failure for topic [" + topic + "]: " + e.getMessage());
