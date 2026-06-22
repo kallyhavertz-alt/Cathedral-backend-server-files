@@ -12,5 +12,6 @@ public class NoticeDTO {
     private String formattedTime;
     private String senderId;
     private String senderName;
+    private String fullName;
 
 }
